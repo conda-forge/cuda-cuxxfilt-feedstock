@@ -3,11 +3,13 @@
 {% set cuda_version = "12.9" %}
 {% set platform = "linux-x86_64" %}  # [linux64]
 {% set platform = "linux-ppc64le" %}  # [ppc64le]
-{% set platform = "linux-sbsa" %}  # [aarch64]
+{% set platform = "linux-sbsa" %}  # [aarch64 and arm_variant_type=="sbsa"]
+{% set platform = "linux-aarch64" %}  # [aarch64 and arm_variant_type=="tegra"]
 {% set platform = "windows-x86_64" %}  # [win]
 {% set target_name = "x86_64-linux" %}  # [linux64]
 {% set target_name = "ppc64le-linux" %}  # [ppc64le]
-{% set target_name = "sbsa-linux" %}  # [aarch64]
+{% set target_name = "sbsa-linux" %}  # [aarch64 and arm_variant_type=="sbsa"]
+{% set target_name = "aarch64-linux" %}  # [aarch64 and arm_variant_type=="tegra"]
 {% set target_name = "x64" %}  # [win]
 {% set extension = "tar.xz" %}  # [not win]
 {% set extension = "zip" %}  # [win]
@@ -19,11 +21,12 @@ package:
 source:
   url: https://developer.download.nvidia.com/compute/cuda/redist/cuda_cuxxfilt/{{ platform }}/cuda_cuxxfilt-{{ platform }}-{{ version }}-archive.{{ extension }}
   sha256: 833d7e56351d032717f217212577d369d230e284b2ded4bf151403cc11213add  # [linux64]
-  sha256: 2175ef96b523eb8fea5d6ccfd21b70d6afaee623d00dbab70f11e8aa892c2828  # [aarch64]
+  sha256: 2175ef96b523eb8fea5d6ccfd21b70d6afaee623d00dbab70f11e8aa892c2828  # [aarch64 and arm_variant_type=="sbsa"]
+  sha256: 37acae6576874c3781e844ea268a9fe076d13aaab3acda6f65bbe885a3726a3c  # [aarch64 and arm_variant_type=="tegra"]
   sha256: ec5911d680394d90968c480c7359e7f5a4025b9c4806dad673d489e57585afd3  # [win]
 
 build:
-  number: 0
+  number: 1
   binary_relocation: false
   skip: true  # [osx or ppc64le]
 
@@ -37,6 +40,7 @@ requirements:
     - cuda-version {{ cuda_version }}
   run:
     - {{ pin_compatible("cuda-version", max_pin="x.x") }}
+    - arm-variant * {{ arm_variant_type }}  # [aarch64]
 
 test:
   requires:
